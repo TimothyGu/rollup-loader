@@ -14,12 +14,20 @@ module: {
     }
   ],
 },
-rollup: [
-  require('rollup-plugin-babel')({
-    exclude: 'node_modules/**',
-    preset: ['es2015-rollup']
-  })
-]
+rollup: {
+  external(id) {
+    const split = id.split('/')
+    const {dependencies} = require('./package.json')
+    return split[0] in dependencies ||
+      split.slice(0, 2).join('/') in dependencies
+  },
+  plugins: [
+    require('rollup-plugin-babel')({
+      exclude: 'node_modules/**',
+      preset: ['es2015-rollup']
+    })
+  ]
+}
 // or use babel-loader if you like
 // loaders: ['rollup', 'babel']
 ```
