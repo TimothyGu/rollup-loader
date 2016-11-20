@@ -9,15 +9,16 @@ module.exports = function (source, inputSourceMap) {
   var filename = webpackRemainingChain[webpackRemainingChain.length - 1]
   
   var rollupConfig = Object.assign({
-    entry: filename,
+    entry: {
+      path: filename,
+      contents: source
+    },
     plugins: [],
     external(id) {
       return !(/\.(js|es6)$/.test(id))
     }
   }, this.options.rollup)
-  rollupConfig.plugins.unshift(memory({
-    contents: source
-  }));
+  rollupConfig.plugins.unshift(memory());
 
   this.cacheable()
   rollup
