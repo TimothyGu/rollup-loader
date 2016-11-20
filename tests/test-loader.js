@@ -44,9 +44,12 @@ describe('loader', function () {
       }
     }
     webpack(config, function(err, stats) {
-      expect(err).to.be(null)
+      if (err) return done(err)
       if (stats.hasErrors()) {
-        return console.log(stats.toJson())
+        var json = stats.toJson();
+        console.error(json)
+        json.errors.forEach(e => console.error(e))
+        return done(new Error(json.errors[0]))
       }
       var file = fs.readFileSync(path.join(outputDir, 'bundle.js'), 'utf8')
       expect(file.indexOf('10px') !== -1).to.be(true)
