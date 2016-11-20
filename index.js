@@ -3,6 +3,8 @@ var memory = require('rollup-plugin-memory')
 var loaderUtils = require('loader-utils')
 
 module.exports = function (source, inputSourceMap) {
+  var context = this
+
   var cb = this.async()
 
   var webpackRemainingChain = loaderUtils.getRemainingRequest(this).split('!')
@@ -18,12 +20,15 @@ module.exports = function (source, inputSourceMap) {
       return !(/\.(js|es6)$/.test(id))
     }
   }, this.options.rollup)
-  rollupConfig.plugins.unshift(memory());
+  rollupConfig.plugins.unshift(memory())
 
   this.cacheable()
   rollup
     .rollup(rollupConfig)
     .then(function (bundle) {
+      bundle.modules.forEach(mod => {
+        context.addDependency(mod.id)
+      })
       var result = bundle.generate({
         format: 'cjs'
       })
